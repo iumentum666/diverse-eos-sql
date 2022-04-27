@@ -1,16 +1,16 @@
 Select
-request_id,
-event_dttm,
-note,
-substring(note, patindex('%sluttdato%', note)+10, patindex('%.%', note) - (patindex('%sluttdato%', note)+10)) AS 'KA-dato før konvertering',
+rev.request_id,
+rev.event_dttm,
+rev.note,
+substring(rev.note, patindex('%sluttdato%', rev.note)+10, patindex('%.%', rev.note) - (patindex('%sluttdato%', rev.note)+10)) AS 'KA-dato før konvertering',
 
 CASE
 	WHEN
-		isdate(substring(note, patindex('%sluttdato%', note)+10, patindex('%.%', note) - (patindex('%sluttdato%', note)+10))) = 1
+		isdate(substring(rev.note, patindex('%sluttdato%', rev.note)+10, patindex('%.%', rev.note) - (patindex('%sluttdato%', rev.note)+10))) = 1
 		THEN
-			CAST(substring(note, patindex('%sluttdato%', note)+10, patindex('%.%', note) - (patindex('%sluttdato%', note)+10)) as DATETIME2)
+			CAST(substring(rev.note, patindex('%sluttdato%', rev.note)+10, patindex('%.%', rev.note) - (patindex('%sluttdato%', rev.note)+10)) as DATETIME2)
 		ELSE
 			''
 	END as 'KA-dato'
-from request_event where note like ('Status endret til KA%')
-and event_dttm > '2022-04-01'
+from request_event rev where rev.note like ('Status endret til KA%')
+and rev.event_dttm > '2022-04-01'

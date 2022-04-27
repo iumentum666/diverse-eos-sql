@@ -1,22 +1,3 @@
-/**
-FTTB Leveringspresisjon :
-•	Utvalgskriterier : Ajourførte ordrer i en gitt periode. Bruker ajourførte da ordene da ikke skal kunne endres i forhold til målingen.
-•	Måling: Hvis det er satt KA på ordren så skal den måles mot oppdatert avtalt dato med kunde. Hvis det er satt EL eller det ikke er satt noen kode så måles ordren mot opprinnelig avtalt dato med kunde.
-•	Hvis dato for teknisk levert > dato det skal måles mot så er presisjon 0% på den enkelte ordre.  (presisjon = 0)
-•	Hvis dato er <= dato det måles mot så er presisjon 100% på den enkelte ordre. (presisjon = 1)
-•	Leveringspresisjon =  Sum(presisjon) / Sum(antall ordrer levert) * 100%
-
-
-FTTB Datoflytting :
-•	Utvalgskriterier : Ajourførte ordrer i en gitt periode for GPON. (Foreløpig har det vært tilnærmet umulig å telle endringer for Flow1, men det jobbes med å inkludere dette også.)
-•	Måling:
-•	Teller opp antall datoflyttinger på en ordre hvor flytting er knyttet til en EL
-•	Merker ordren med 1 for datoflyttinger om antall datoflyttinger i forrige punkt > 0, ellers 0
-•	Gjennomsnitt antall datoflyttinger for de som flyttes = Sum(antall datoflyttinger) / sum(ordrer med datoflytting)
-•	Andel datoflyttinger = sum(ordrer med datoflytting) / Sum(antall ordrer levert) * 100%
-**/
-
-
 SELECT r.request_id                                       as 'Ordre ID',
        r.cross_reference                                  as 'Eksternt ordrenummer',
        r.req_status                                       as 'Intern status',
@@ -33,6 +14,7 @@ SELECT r.request_id                                       as 'Ordre ID',
 	   CONVERT(DATETIME2(0), ua.[UA dato])				  as 'UA dato',
 	   CONVERT(DATETIME2(0), vk.[VK dato])				  as 'VK dato',
 	   CONVERT(DATETIME2(0), ka.[KA dato])				  as 'KA dato',
+	   CONVERT(DATETIME2(0), kad.[KA-dato])				  as 'Ny KA dato satt',
 	   CONVERT(DATETIME2(0), travel.[Reise startet])	  as 'Reise startet',
 	   CONVERT(DATETIME2(0), labor.[Arbeid startet])	  as 'Arbeid startet',
        r.severity                                         as 'Prioritet',
@@ -94,6 +76,16 @@ FROM request r
 		 OUTER APPLY (Select top 1 work_dt as 'Reise startet' from non_part_usage where request_id = r.request_id and line_code = 'TRAVEL') travel
 		 OUTER APPLY (Select top 1 work_dt as 'Arbeid startet' from non_part_usage where request_id = r.request_id and line_code = 'LABOR') labor
 		 OUTER APPLY (SELECT count(last_event_dttm) as 'Antall EL' from mwf_log where request_id = r.request_id and external_status in ('EL') and note in ('E305 Operasjon vellykket.', 'Ok', 'OK - Status Changed', 'Statusendring sendt') and last_event_dttm is not null) antall_el
+		 OUTER APPLY (Select top 1 substring(rev.note, patindex('%sluttdato%', rev.note)+10, patindex('%.%', rev.note) - (patindex('%sluttdato%', rev.note)+10)) AS 'KA-dato før konvertering',
+				CASE
+					WHEN
+						isdate(substring(rev.note, patindex('%sluttdato%', rev.note)+10, patindex('%.%', rev.note) - (patindex('%sluttdato%', rev.note)+10))) = 1
+						THEN
+							CAST(substring(rev.note, patindex('%sluttdato%', rev.note)+10, patindex('%.%', rev.note) - (patindex('%sluttdato%', rev.note)+10)) as DATETIME2)
+						ELSE
+							''
+					END as 'KA-dato'
+				from request_event rev where rev.note like ('Status endret til KA%') and rev.request_id = r.request_id ORDER by rev.event_dttm DESC) kad
 
 WHERE r.req_class = 'MARIUS'
-  AND r.created_dttm > '2022-04-01'
+ AND r.created_dttm > '2022-03-01'

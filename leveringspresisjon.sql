@@ -90,3 +90,4 @@ FROM request r
 
 WHERE r.req_class = 'MARIUS'
  AND r.created_dttm > '2022-03-01'
+  and re.businesstype != 'Privat'

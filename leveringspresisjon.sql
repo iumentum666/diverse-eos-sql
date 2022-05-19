@@ -89,5 +89,5 @@ FROM request r
 				from request_event rev where rev.note like ('Status endret til KA%') and rev.request_id = r.request_id ORDER by rev.event_dttm DESC) kad
 
 WHERE r.req_class = 'MARIUS'
- AND r.created_dttm > '2022-03-01'
-  and re.businesstype != 'Privat'
+ AND mwf.dato_for_ok > '2022-03-01'
+  and re.businesstype not in ('Privat', 'Wholesale privat')

@@ -1,22 +1,30 @@
 select
-pu_id,
-request_id,
-person_id,
-part_id,
-quantity,
-note,
-subcon,
-subcon_approver,
-subcon_po,
-endret_dato,
-req_type,
-req_class,
-place_id,
-cross_reference,
-Navn,
-Gate,
-Postnummer,
-CONVERT(DATETIME2(0), linje_opprettet) as 'Linje opprettet'
+po.pu_id,
+po.request_id,
+po.person_id,
+po.part_id,
+po.quantity,
+po.part_id                               as 'Artikkelnummer',
+pu.user_def4                                 as 'Artikkelnavn',
+po.quantity                              as 'Antall',
+pu.unit_price                             as 'Pris per',
+pu.unit_price * pu.quantity                  as 'Totalt per linje',
+po.note,
+po.subcon,
+po.subcon_approver,
+po.subcon_po,
+po.endret_dato,
+po.req_type,
+po.req_class,
+po.place_id,
+po.cross_reference,
+po.Navn,
+po.Gate,
+po.Postnummer,
+CONVERT(DATETIME2(0), po.linje_opprettet) as 'Linje opprettet'
 
-from subcon_po_report
+from subcon_po_report po
+inner join part_usage pu on po.pu_id = pu.pu_id
+
 where subcon is not null
+order by po.request_id asc

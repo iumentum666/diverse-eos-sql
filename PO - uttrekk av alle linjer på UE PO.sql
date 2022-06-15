@@ -1,19 +1,20 @@
 SELECT
-r.request_id                                        AS 'EOS ordre'
-r.cross_reference,                                  AS 'Eksternt ordrenummer'
+r.request_id                                        AS 'EOS ordre',
+r.cross_reference	                                AS 'Eksternt ordrenummer',
+r.user_def6											AS 'IFS Nummer',
 r.req_class                                         AS 'Ordretype',
 rc.user_def3                                        AS 'Kundenavn',
 rc.user_def24                                       AS 'Kundeaddresse',
 rc.user_def14                                       AS 'Postnummer',
 rc.user_def22									    AS 'Poststed',
-pu.part_id AS part_id                               AS 'Produkt/material'
-CONVERT(decimal(38, 2), pu.quantity)                AS 'Antall'
-pu.person_id                                        AS 'Person som lagde fakturalinje'
-pu.note                                             AS 'Notat på fakturalinje'
-CONVERT(DATETIME2(0), pu.created_dttm)              AS 'Fakturalinje opprettet'
+pu.part_id			                                AS 'Produkt/material',
+CONVERT(decimal(38, 2), pu.quantity)                AS 'Antall',
+pu.person_id                                        AS 'Person som lagde fakturalinje',
+pu.note                                             AS 'Notat på fakturalinje',
+CONVERT(DATETIME2(0), pu.created_dttm)              AS 'Fakturalinje opprettet',
 pue.subcon                                          AS 'UE Navn',
 pue.subcon_approver                                 AS 'Person som godkjente linje hos UE',
-pue.subcon_po                                       AS 'UE sitt POnr'
+pue.subcon_po                                       AS 'UE sitt POnr',
 pu.unit_price                                       AS 'Pris per',
 pu.unit_price * pu.quantity                         AS 'Totalt per linje',
 subcon_price.price							        AS 'UE pris',

@@ -1,27 +1,23 @@
 SELECT
-pue.pu_id,
-r.request_id,
-pu.person_id,
-pu.note,
-pue.subcon,
-pue.subcon_approver,
-pue.subcon_po,
-CONVERT(DATETIME2(0), pue.endret_dato)				AS 'Endret dato',
-r.req_type,
-r.req_class,
-r.place_id,
-r.cross_reference,
-rc.user_def3                                             AS 'Kundenavn',
-rc.user_def24                                            AS 'Kundeaddresse',
-rc.user_def14                                            as 'Postnummer',
-rc.user_def22											as 'Poststed',
-CONVERT(DATETIME2(0), pu.created_dttm) AS linje_opprettet,
-pu.part_id AS part_id,
-CONVERT(decimal(38, 2), pu.quantity) AS quantity,
-pu.unit_price                             as 'Pris per',
-pu.unit_price * pu.quantity               as 'Totalt per linje',
-subcon_price.price							as 'UE pris',
-subcon_price.price * pu.quantity			as 'UE totalpris per linje'
+r.request_id                                        AS 'EOS ordre'
+r.cross_reference,                                  AS 'Eksternt ordrenummer'
+r.req_class                                         AS 'Ordretype',
+rc.user_def3                                        AS 'Kundenavn',
+rc.user_def24                                       AS 'Kundeaddresse',
+rc.user_def14                                       AS 'Postnummer',
+rc.user_def22									    AS 'Poststed',
+pu.part_id AS part_id                               AS 'Produkt/material'
+CONVERT(decimal(38, 2), pu.quantity)                AS 'Antall'
+pu.person_id                                        AS 'Person som lagde fakturalinje'
+pu.note                                             AS 'Notat på fakturalinje'
+CONVERT(DATETIME2(0), pu.created_dttm)              AS 'Fakturalinje opprettet'
+pue.subcon                                          AS 'UE Navn',
+pue.subcon_approver                                 AS 'Person som godkjente linje hos UE',
+pue.subcon_po                                       AS 'UE sitt POnr'
+pu.unit_price                                       AS 'Pris per',
+pu.unit_price * pu.quantity                         AS 'Totalt per linje',
+subcon_price.price							        AS 'UE pris',
+subcon_price.price * pu.quantity			        AS 'UE totalpris per linje'
 
 FROM part_usage pu
 

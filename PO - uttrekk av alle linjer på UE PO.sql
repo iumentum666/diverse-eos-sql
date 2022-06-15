@@ -2,6 +2,8 @@ SELECT
 r.request_id                                        AS 'EOS ordre',
 r.cross_reference	                                AS 'Eksternt ordrenummer',
 r.user_def6											AS 'IFS Nummer',
+a.county_id                                         AS 'Fylke',
+r.sales_grp_d                                       AS 'Avdeling',
 r.req_class                                         AS 'Ordretype',
 rc.user_def3                                        AS 'Kundenavn',
 rc.user_def24                                       AS 'Kundeaddresse',
@@ -30,6 +32,8 @@ OUTER APPLY (SELECT TOP 1 user_def3, user_def24, user_def14, user_def22 FROM req
 
 LEFT OUTER JOIN subcon_price ON subcon_price.part_id = pu.part_id --WHERE request_id = pue.related_request_id
 
+INNER JOIN place_address pa on r.place_id = pa.place_id and pa.address_type = 'DEFAULT'
+INNER JOIN address a on pa.address_id = a.address_id
 
 where pue.subcon is not null
 order by r.request_id asc

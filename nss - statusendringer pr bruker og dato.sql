@@ -1,6 +1,10 @@
 SELECT
 CAST(re.event_dttm as date) as 'Status endret',
+r.req_class as 'Ordrertype',
+r.sales_grp_d as 'Avdeling på ordre',
 re.created_by as 'Person sendt KA',
+p.first_name as 'Fornavn',
+p.last_name as 'Etternavn',
 p.user_def12 as 'Avdeling på person',
 
 CASE
@@ -24,5 +28,7 @@ CASE
 
 from request_event re
 inner join person p on re.created_by = p.person_id
+inner join request r on re.request_id = r.request_id
 where re.note like 'Status endret til%'
-and re.event_dttm >= '2022-01-01'
+and re.event_dttm >= '2022-01-01' and p.user_def12 = '20139'
+order by re.created_dttm, p.person_id asc

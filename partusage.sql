@@ -10,3 +10,5 @@ SELECT [pu_id] as PartUsageID
       ,p.user_def_num2 as CRLN
   FROM [IFSFSMPROD].[dbo].[part_usage] p
   LEFT JOIN [IFSFSMPROD].[dbo].[request] r on p.request_id = r.request_id
+
+  -- test av commit

@@ -19,8 +19,8 @@ at.file_extension
 from request r
 
 outer apply (
-select top 1 pu.part_id, pu.user_def4
-from part_usage pu where r.request_id = pu.request_id) pu
+select pu.part_id, pu.user_def4
+from part_usage pu where r.request_id = pu.request_id group by pu.part_id, pu.user_def4) pu
 
 outer apply (
 	select
@@ -35,4 +35,4 @@ outer apply (
 		and at.request_id = r.request_id) at
 
 WHERE pu.part_id = 'DT62'
-  AND r.created_dttm > DateAdd(d, -60, GetDate())
+  AND r.created_dttm > '2022-01-01' --and  r.sales_grp_d in ('20059', '20061')

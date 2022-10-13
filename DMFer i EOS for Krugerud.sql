@@ -113,5 +113,5 @@ FROM request r
 		 left join part_usage pu on pu.request_id = r.request_id
 
 
-WHERE pu.part_id = 'DT62'
+WHERE pu.part_id in('DS03', 'DS05', 'DS06', 'DS07', 'DS10a', 'DS10b', 'DS92', 'DS93')
   AND r.created_dttm > '2019-01-01'
